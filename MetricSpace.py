@@ -5,7 +5,7 @@ import torch
 device = torch.device("cuda:0")
 
 class MetricSpace(abc.ABC):
-    r"""Class for metric space.
+    """Class for metric space.
     Parameters
     ----------
     dim : int
