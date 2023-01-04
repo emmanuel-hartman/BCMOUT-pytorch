@@ -29,7 +29,7 @@ class Sphere(MetricSpace):
         
         
     def random_point(self, n_samples=1):
-        """Sample random points on the metric space according to some distribution.
+        """Sample random points on the metric space according to a uniform distribution.
         Parameters
         ----------
         n_samples : int
@@ -56,4 +56,4 @@ class Sphere(MetricSpace):
             Float evaluating the distance between two points in the metric space.
         """
         
-        return 
+        return torch.acos(torch.einsum('ai,bi->ab', point1,point2))

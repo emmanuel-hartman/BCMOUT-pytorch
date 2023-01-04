@@ -11,14 +11,15 @@ class ConeOverM(MetricSpace):
     shape : tuple of int
         Shape of one element of M 
     """
-    def __init__(self,metricSpace, measure, dim, ):
-        self.dim = metricSpace.dim + 1
-        self.point_ndim = len(self.shape) + 1
+    def __init__(self, M, delta):
+        self.M = M
+        self.dim = M.dim + 1
+        self.delta = delta
+        self.shape = ???? 
         return
     
-    def belongs(self,point,atol):
-
-        return torch.isclose(torch.linalg.norm(point,dim=0), torch.ones((point.shape[0])), atol=atol)
+    def belongs(self,point,atol):        
+        return 
 
     def randomPoint(self, samples=1):
         for i in samples:
