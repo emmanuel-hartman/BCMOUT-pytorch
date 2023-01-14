@@ -1,4 +1,5 @@
 import torch
+from MetricSpace import MetricSpace 
 device = torch.device("cuda:0")
 
 
@@ -28,7 +29,7 @@ class Hypersphere(MetricSpace):
         return torch.isclose(torch.linalg.norm(point,dim=0), torch.ones((point.shape[0])), atol=atol)
         
         
-    def random_point(self, n_samples=1):
+    def random(self, n_samples=1):
         """Sample random points on the metric space according to a uniform distribution.
         Parameters
         ----------
@@ -44,12 +45,12 @@ class Hypersphere(MetricSpace):
         samples : array-like, shape=[..., *point_shape]
             Points sampled in the metric space.
         """
-        rand = torch.rand(n_samples, shape)
-        points = torch.zeros(n_samples, shape)
+        rand = torch.rand(n_samples, self.shape)
+        points = torch.zeros(n_samples, self.shape)
         for i in n_samples:
-            points[i,:] = rand[i,:]/torch.linalg.norm(rand[i,:])            
+            points[i] = torch.div(rand[i],torch.linalg.norm(rand[i]))
         
-        return 
+        return points
     
     def distance(self,point1,point2):
         """Compute the distance between two points.
