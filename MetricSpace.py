@@ -8,8 +8,6 @@ class MetricSpace(abc.ABC):
     """Class for metric space.
     Parameters
     ----------
-    dim : int
-        Dimension of the metric space.
     shape : tuple of int
         Shape of one element of the metric space.
         Optional, default : None.
@@ -21,11 +19,9 @@ class MetricSpace(abc.ABC):
         Dimension of point array.
     """
 
-    def __init__(self, dim, shape, **kwargs):
+    def __init__(self, shape, **kwargs):
         super().__init__(**kwargs)
-
-        self.dim = dim
-        self.shape = shape
+        
         self.point_ndim = len(self.shape)
 
     @abc.abstractmethod
@@ -44,7 +40,7 @@ class MetricSpace(abc.ABC):
         """
         
     @abc.abstractmethod
-    def random_point(self, n_samples=1):
+    def random(self, n_samples=1):
         """Sample random points on the metric space according to some distribution.
         Parameters
         ----------
@@ -58,8 +54,8 @@ class MetricSpace(abc.ABC):
         """
 
     @abc.abstractmethod
-    def distance(self,point1,point2):
-        """Compute the distance between two points.
+    def distance(self, points):
+        """Compute the distance between two or more points.
         Parameters
         ----------
         point1 : array-like, shape=[..., *point_shape]

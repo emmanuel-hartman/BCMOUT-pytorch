@@ -2,14 +2,14 @@ import torch
 device = torch.device("cuda:0")
 
 
-class Sphere(MetricSpace):
-    """
+class Hypersphere(MetricSpace):
+    """Class for a hypersphere of radius 1 centered at the origin
     """
     
-    def __init__(self, dim):
+    def __init__(self, dim, shape):
         self.dim = dim
-        shape=dim+1
-        super().__init__(dim=dim)
+        self.shape = shape
+        super().__init__(shape)
       
     def belongs(self, point, atol):
         """Evaluate if a point belongs to the metric space.
@@ -35,11 +35,20 @@ class Sphere(MetricSpace):
         n_samples : int
             Number of samples.
             Optional, default: 1.
+        rand = array-like
+            Random numbers to be used in the projection onto the hypersphere
+        points = array-like
+            Points on the sphere following projected from 
         Returns
         -------
         samples : array-like, shape=[..., *point_shape]
             Points sampled in the metric space.
         """
+        rand = torch.rand(n_samples, shape)
+        points = torch.zeros(n_samples, shape)
+        for i in n_samples:
+            points[i,:] = rand[i,:]/torch.linalg.norm(rand[i,:])            
+        
         return 
     
     def distance(self,point1,point2):
