@@ -3,14 +3,13 @@ from MetricSpace import MetricSpace
 device = torch.device("cuda:0")
 
 
-class Hypersphere(MetricSpace):
-    """Class for a hypersphere of radius 1 centered at the origin
+class Sphere(MetricSpace):
+    """Class for a sphere
     """
     
-    def __init__(self, dim, shape):
+    def __init__(self, dim, n_dim):
         self.dim = dim
-        self.shape = shape
-        super().__init__(shape)
+        super().__init__(self.shape)
       
     def belongs(self, point, atol):
         """Evaluate if a point belongs to the metric space.
@@ -45,11 +44,10 @@ class Hypersphere(MetricSpace):
         samples : array-like, shape=[..., *point_shape]
             Points sampled in the metric space.
         """
-        rand = torch.rand(n_samples, self.shape)
-        points = torch.zeros(n_samples, self.shape)
-        for i in n_samples:
-            points[i] = torch.div(rand[i],torch.linalg.norm(rand[i]))
-        
+        shape = self.shape + 1
+        points = torch.rand(n_samples, self.n_dim)
+        for i in range(n_samples):
+            points[i] 
         return points
     
     def distance(self,point1,point2):

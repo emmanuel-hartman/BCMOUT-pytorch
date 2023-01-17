@@ -13,8 +13,8 @@ class ConeOverM(MetricSpace):
         shape of the measure space + 1
     """
     def __init__(self, Measures, delta):
-        self.shape = Measures.M.shape + 1
-        self.points = np.array([Measures.
+        self.shape = MeasuresSpace.M.shape + 1
+        self.points = 
         return
     
     def belongs(self,point,atol):        

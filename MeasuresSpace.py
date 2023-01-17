@@ -8,16 +8,17 @@ device = torch.device("cuda:0")
 class MeasuresSpace:
     """Class for space of measures over a metric space M. Should allow comparison"""
 
-    def __init__(self):
+    def __init__(self, M):
         """
         Parameters
         ----------
         M : MetricSpace
             Space which the measures are over
         """
+        self.M = M
         return
 
-    def distance(self):
+    def distance(self, point1, point2):
         """Here we have our algorithm"""
         
         return
@@ -33,12 +34,13 @@ class MeasuresSpace:
         n_points : int
             number of points to be randomly sampled. 
         """
-        if points != 0:
+        if points != 0 and n_points = 0:
             
-        elif n_points !=0:
+        elif n_points !=0 and points = 0:
 
         else:
             raise NameError('Please provide an array of points or a number of points to be sampled')
+    return
                 
 
     def belongs(self, Measures):
