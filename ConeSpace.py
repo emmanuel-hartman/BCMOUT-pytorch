@@ -58,4 +58,4 @@ class ConeOverM(MetricSpace):
                 
         d= Rpoint1.reshape(-1,1)+Rpoint2
         d=d-2*torch.sqrt(torch.outer(Rpoint1, Rpoint2))*self._energy(Mpoint1,Mpoint2)     
-        return 2*(self.delta**2)*d
+        return torch.sqrt(2*(self.delta**2)*d)
