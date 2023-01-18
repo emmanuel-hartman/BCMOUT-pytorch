@@ -1,15 +1,15 @@
 import torch
+from MetricSpace import MetricSpace 
 device = torch.device("cuda:0")
 
 
 class Sphere(MetricSpace):
-    """
+    """Class for a sphere
     """
     
-    def __init__(self, dim):
+    def __init__(self, dim, n_dim):
         self.dim = dim
-        shape=dim+1
-        super().__init__(dim=dim)
+        super().__init__(self.shape)
       
     def belongs(self, point, atol):
         """Evaluate if a point belongs to the metric space.
@@ -28,19 +28,27 @@ class Sphere(MetricSpace):
         return torch.isclose(torch.linalg.norm(point,dim=0), torch.ones((point.shape[0])), atol=atol)
         
         
-    def random_point(self, n_samples=1):
+    def random(self, n_samples=1):
         """Sample random points on the metric space according to a uniform distribution.
         Parameters
         ----------
         n_samples : int
             Number of samples.
             Optional, default: 1.
+        rand = array-like
+            Random numbers to be used in the projection onto the hypersphere
+        points = array-like
+            Points on the sphere following projected from 
         Returns
         -------
         samples : array-like, shape=[..., *point_shape]
             Points sampled in the metric space.
         """
-        return 
+        shape = self.shape + 1
+        points = torch.rand(n_samples, self.n_dim)
+        for i in range(n_samples):
+            points[i] 
+        return points
     
     def distance(self,point1,point2):
         """Compute the distance between two points.
