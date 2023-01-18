@@ -1,6 +1,6 @@
 import torch
 import numpy as np
-import ConeOverM.py
+import ConeSpace
 import abc
 device = torch.device("cuda:0")
 
@@ -16,37 +16,32 @@ class MeasuresSpace:
             Space which the measures are over
         """
         self.M = M
-        return
+        self.dim = M.dim+1
+        self.shape = M.shape + 1
+        
+    def random(self, n_supports=1, maxWeight=1):
+        """Create some random measures over a metric space M according to a uniform distribution.
+        Parameters
+        ----------
+        """
+        
+        supports = self.M.random(n_supports)
+        masses = maxWeight*torch.rand(1,n_supports)
+        point = torch.concat([masses,supports], dim=0)
+        
+        return point
+                
+
+    def belongs(self, points):
+        """Checks whether or not two or more measures are over the same base space M"""
+        
+        
+        return 
+    
 
     def distance(self, point1, point2):
         """Here we have our algorithm"""
         
         return
 
-    def random(self, n_samples, points=0, n_points=0):
-        """Create some random measures over a metric space M according to a uniform distribution.
-        Parameters
-        ----------
-        points : array-like
-            array of points in M
-        n_samples : int
-            number of samples to be taken
-        n_points : int
-            number of points to be randomly sampled. 
-        """
-        if points != 0 and n_points = 0:
-            
-        elif n_points !=0 and points = 0:
-
-        else:
-            raise NameError('Please provide an array of points or a number of points to be sampled')
-    return
-                
-
-    def belongs(self, Measures):
-        """Checks whether or not two or more measures are over the same base space M"""
-        for i in Measures:
-        
-        return belongs
-    
     

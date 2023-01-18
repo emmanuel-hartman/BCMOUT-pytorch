@@ -13,17 +13,16 @@ class MetricSpace(abc.ABC):
     ----------
     distance : 
         distance on the metric space.
-    point_ndim : int
-        Dimension of point array.
+    shape : int
+        Dimension of the array that represents the point.
     """
 
-    def __init__(self, shape, **kwargs):
+    def __init__(self, **kwargs):
         super().__init__(**kwargs)
         
-        self.point_ndim = len(self.shape)
 
     @abc.abstractmethod
-    def belongs(self, point, atol):
+    def belongs(self, points, atol):
         """Evaluate if a point belongs to the metric space.
         Parameters
         ----------
@@ -38,7 +37,7 @@ class MetricSpace(abc.ABC):
         """
         
     @abc.abstractmethod
-    def random(self, n_samples=1):
+    def random(self, samples=1):
         """Sample random points on the metric space according to some distribution.
         Parameters
         ----------
