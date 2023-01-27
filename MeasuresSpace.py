@@ -53,9 +53,12 @@ class MeasuresSpace:
         Omega1 = self.CoM._energy(u,v)
         Omega = torch.zeros((Omega1.shape[0]+1,Omega1.shape[1]+1)).to(device)
         Omega[1:,1:]= Omega1
+        colsum = torch.sum(Omega1, 1).to(device)
+        rowsum = torch.sum(Omega1, 0).to(device)
+        Omega[0,:] = colsum
+        Omega[:,0] = rowsum
 
     def distance(self, point1, point2):
-        """Here we have our algorithm"""
         distance = torch.zeros((len(point1),len(point2)))
         for i in range(0, distance.shape[0]):
             for j in range(0,distance.shape[1]):
