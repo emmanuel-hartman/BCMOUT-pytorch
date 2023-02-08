@@ -10,7 +10,7 @@ class Sphere(MetricSpace):
     
     def __init__(self, dim):
         self.dim = dim
-        self.shape= dim+1
+        self.shape= [dim + 1]
         super().__init__()
       
     def belongs(self, points, atol=1e-6):
@@ -47,7 +47,7 @@ class Sphere(MetricSpace):
             Points sampled in the metric space.
         """
         
-        points = 2*torch.rand(self.shape,samples)-1
+        points = torch.rand([samples] + self.shape)
         return points/torch.linalg.norm(points,dim=0)
     
     def distance(self,point1,point2):
