@@ -5,8 +5,10 @@ from Sphere import Sphere
 device = torch.device("cuda:0")
 M = Sphere(3)
 Measures = MeasuresSpace(M, 2)
-k = Measures.random(1,3,4)
-print(k)
+k1 = Measures.random(1,3,4)
+k2 = Measures.random(1,4,5)
+m = Measures.distance(k1,k2, 100, 0.001)
+print(m)
 #Omega1 = Measures.CoM._energy(u,v)
 
 #R = torch.eye(3).to(device)

@@ -63,8 +63,7 @@ class ConeOverM(MetricSpace):
     
     def _energy(self,Mpoint1,Mpoint2):
         """
-        Helper function in computing the distance on the cone space. 
-        Takes the cos of the distance of the M components over 2*delta and sends negative values to 0.
+        Takes in 
         Parameters
         ---------
         Mpoint1 : tensor

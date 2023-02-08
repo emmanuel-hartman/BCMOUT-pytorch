@@ -76,12 +76,12 @@ class MeasuresSpace:
         
         
 
-    def distance(self, point1, point2):
+    def distance(self, point1, point2, steps, eps):
         
         distance = torch.zeros((len(point1),len(point2)))
         for i in range(0, distance.shape[0]):
             for j in range(0,distance.shape[1]):
-                distance[i,j]=self._pairwise_distance(point1[i], point2[j])
+                distance[i,j]=self._pairwise_distance(point1[i], point2[j], steps, eps)
         return distance
     
     def _cost(self, P, Q, Omega):
