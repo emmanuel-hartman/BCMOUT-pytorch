@@ -4,20 +4,20 @@ from MetricSpace import MetricSpace
 device = torch.device("cuda:0")
 
 
-class Sphere(MetricSpace):
-    """Class for a sphere
+class Euclidean(MetricSpace):
+    """Class for a Euclidean Space
     """
     
     def __init__(self, dim):
         self.dim = dim
-        self.shape= dim+1
+        self.shape= dim
         super().__init__()
       
     def belongs(self, points, atol=1e-6):
         """Evaluate if a point belongs to the metric space.
         Parameters
         ----------
-        point : array-like, shape=[point_shape,num_points]
+        point : array-like, shape=[num_points, point_shape]
             Point to evaluate.
         atol : float
             Absolute tolerance.
@@ -27,10 +27,10 @@ class Sphere(MetricSpace):
             Boolean evaluating if point belongs to the metric space.
         """
         
-        return torch.isclose(torch.linalg.norm(points,dim=0), torch.ones((points.shape[1])), atol=atol)
+        return (points.shape[0]==self.shape)*torch.ones(points.shape[1], dtype=torch.bool)
         
         
-    def random(self, samples=1):
+    def random(self, bound=1.0,samples=1):
         """Sample random points on the metric space according to a uniform distribution.
         Parameters
         ----------
@@ -43,12 +43,12 @@ class Sphere(MetricSpace):
             Points on the sphere following projected from 
         Returns
         -------
-        samples : array-like, shape=[point_shape,n_samples]
+        samples : array-like, shape=[n_samples, point_shape]
             Points sampled in the metric space.
         """
         
-        points = 2*torch.rand(self.shape,samples)-1
-        return points/torch.linalg.norm(points,dim=0)
+        points = 2*bound*torch.rand(self.shape,samples)-1
+        return points
     
     def distance(self,point1,point2):
         """Compute the distance between two points.
@@ -63,7 +63,6 @@ class Sphere(MetricSpace):
         belongs : array-like, shape=[num_points1, num_points2, 1]
             Float evaluating the distance between two points in the metric space.
         """
-        in_prod = torch.einsum('ia,ib->ab', point1,point2)
-        d=torch.acos(in_prod)        
-        d[in_prod>=1-1e-6] = 0        
-        return d
+        
+        diffs= point1.reshape(point1.shape[0],1,point1.shape[1])-point2.reshape(point2.shape[0],point2.shape[1],1)          
+        return torch.sqrt((diffs**2).sum(dim=0))
