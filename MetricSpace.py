@@ -1,6 +1,6 @@
 import abc
 import torch
-device = torch.device("cuda:0")
+from Metric import Metric
 
 class MetricSpace(abc.ABC):
     """Class for metric space.
@@ -11,13 +11,15 @@ class MetricSpace(abc.ABC):
         Optional, default : None.
     Attributes
     ----------
-    distance : 
-        distance on the metric space.
+    metric : 
+        metric on the metric space.
     shape : int
         Dimension of the array that represents the point.
     """
 
-    def __init__(self, **kwargs):
+    def __init__(self, dim, metric=None, **kwargs):
+        self.dim=dim
+        self._metric=metric
         super().__init__(**kwargs)
         
 
@@ -49,18 +51,22 @@ class MetricSpace(abc.ABC):
         samples : array-like, shape=[..., *point_shape]
             Points sampled in the metric space.
         """
+    
+    def distance(self,points1,points2,**kwargs):
+        return self._metric.distance(points1,points2, **kwargs)
+        
+    def dissimilarity(self,point1,**kwargs):
+        return self.distance(point1,point1,**kwargs)
+        
+    @property
+    def metric(self):
+        """Metric associated to the space."""
+        return self._metric
 
-    @abc.abstractmethod
-    def distance(self, points):
-        """Compute the distance between two or more points.
-        Parameters
-        ----------
-        point1 : array-like, shape=[..., *point_shape]
-            Point to evaluate.
-        point2 : array-like, shape=[..., *point_shape]
-            Point to evaluate.
-        Returns
-        -------
-        belongs : array-like, shape=[..., ..., 1]
-            Float evaluating the distance between two points in the metric space.
-        """
+    @metric.setter
+    def metric(self, metric):
+        if metric is not None:
+            if not isinstance(metric, Metric):
+                raise ValueError("The argument must be a Metric object")
+        self._metric = metric
+

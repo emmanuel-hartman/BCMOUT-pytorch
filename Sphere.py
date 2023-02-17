@@ -1,6 +1,8 @@
 import torch
 import numpy as np
 from MetricSpace import MetricSpace 
+from Metric import Metric
+from Euclidean import EuclideanMetric
 device = torch.device("cuda:0")
 
 
@@ -8,10 +10,10 @@ class Sphere(MetricSpace):
     """Class for a sphere
     """
     
-    def __init__(self, dim):
-        self.dim = dim
-        self.shape= dim+1
-        super().__init__()
+    def __init__(self, dim, **kwargs):
+        kwargs.setdefault("metric", SphericalMetric())
+        self.shape= dim
+        super().__init__(dim, **kwargs)
       
     def belongs(self, points, atol=1e-6):
         """Evaluate if a point belongs to the metric space.
@@ -49,6 +51,11 @@ class Sphere(MetricSpace):
         
         points = 2*torch.rand(self.shape,samples)-1
         return points/torch.linalg.norm(points,dim=0)
+        
+    
+class SphericalMetric(Metric):
+    def __init__(self):
+        super().__init__()    
     
     def distance(self,point1,point2):
         """Compute the distance between two points.
@@ -65,5 +72,6 @@ class Sphere(MetricSpace):
         """
         in_prod = torch.einsum('ia,ib->ab', point1,point2)
         d=torch.acos(in_prod)        
-        d[in_prod>=1-1e-6] = 0        
+        d[torch.logical_and(torch.isnan(d),in_prod>0)] = 0    
+        d[torch.logical_and(torch.isnan(d),in_prod<0)] = np.pi        
         return d

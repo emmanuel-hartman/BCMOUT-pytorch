@@ -2,6 +2,7 @@ import abc
 import torch
 import numpy as np
 from MetricSpace import MetricSpace 
+from Metric import Metric
 device = torch.device("cuda:0")
 
 class ConeOverM(MetricSpace):
@@ -14,11 +15,12 @@ class ConeOverM(MetricSpace):
         parameter that defines the metric on the cone
         
     """
-    def __init__(self, M, delta):
+    def __init__(self, M, delta, **kwargs):
+        kwargs.setdefault("metric", CosBarMetric(M,delta))
         self.M=M
-        self.dim = M.dim+1
-        self.shape = M.shape + 1
-        self.delta = delta 
+        self.delta=delta
+        self.shape = M.shape + 1 
+        super().__init__( M.dim+1, **kwargs)
         
     def belongs(self,points,atol=1e-6):        
         Mpoints = points[1:,:]
@@ -32,6 +34,15 @@ class ConeOverM(MetricSpace):
         Rpoints = maxWeight*torch.rand(1,samples)
         points = torch.concat([Rpoints,Mpoints], dim=0)
         return points
+    
+    def _energy(self,Mpoint1,Mpoint2):
+        return self._metric._energy(Mpoint1,Mpoint2)
+    
+class CosBarMetric(Metric):      
+    def __init__(self,M,delta):
+        self.M=M
+        self.delta =delta
+        super().__init__()
     
     def _energy(self,Mpoint1,Mpoint2):
         Mdist = self.M.distance(Mpoint1,Mpoint2)/(2*self.delta)

@@ -1,6 +1,7 @@
 import torch
 import numpy as np
 from MetricSpace import MetricSpace 
+from Metric import Metric
 device = torch.device("cuda:0")
 
 
@@ -8,10 +9,10 @@ class Euclidean(MetricSpace):
     """Class for a Euclidean Space
     """
     
-    def __init__(self, dim):
-        self.dim = dim
+    def __init__(self, dim, **kwargs):
+        kwargs.setdefault("metric", EuclideanMetric())
         self.shape= dim
-        super().__init__()
+        super().__init__(dim, **kwargs)
       
     def belongs(self, points, atol=1e-6):
         """Evaluate if a point belongs to the metric space.
@@ -49,7 +50,12 @@ class Euclidean(MetricSpace):
         
         points = 2*bound*torch.rand(self.shape,samples)-1
         return points
+
     
+class EuclideanMetric(Metric):    
+    def __init__(self):
+        super().__init__()
+        
     def distance(self,point1,point2):
         """Compute the distance between two points.
         Parameters
@@ -66,3 +72,5 @@ class Euclidean(MetricSpace):
         
         diffs= point1.reshape(point1.shape[0],1,point1.shape[1])-point2.reshape(point2.shape[0],point2.shape[1],1)          
         return torch.sqrt((diffs**2).sum(dim=0))
+    
+

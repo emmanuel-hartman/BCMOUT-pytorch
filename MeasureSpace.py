@@ -1,24 +1,26 @@
 import torch
 import numpy as np
+from MetricSpace import MetricSpace 
+from Metric import Metric
 from ConeSpace import ConeOverM
 import abc
-device = torch.device("cuda:0")
 
-
-class MeasureSpace:
+class MeasureSpace(MetricSpace):
     """Class for space of measures over a metric space M. Should allow comparison"""
 
-    def __init__(self, M, delta):
+    def __init__(self, M, delta, use_cuda=False, **kwargs):
         """
         Parameters
         ----------
         M : MetricSpace
             Space which the measures are over
         """
+        kwargs.setdefault("metric", WFRMetric(M,delta,use_cuda))
         self.M = M
+        self.delta=delta
         self.CoM = ConeOverM(M,delta)
-        self.dim = M.dim+1
         self.shape = float('inf')
+        super().__init__( float('inf') , **kwargs)
         
     def random(self, samples=1, n_supports=1, maxWeight=1):
         """Create some random measures over a metric space M according to a uniform distribution.
@@ -30,19 +32,51 @@ class MeasureSpace:
             supports = self.M.random(samples = n_supports)
             masses = maxWeight*torch.rand(1,n_supports)
             point = torch.concat([masses,supports], dim=0)
-            ls+=[point]
-        
+            ls+=[point]        
         return ls
-                
-
+    
     def belongs(self, points):
-        """Checks whether or not two or more measures are over the same base space M"""
         belongs = torch.zeros((len(points)), dtype=torch.bool)
         for i in range(0,len(points)):
             point=points[i]
             belongs[i]=torch.all(self.CoM.belongs(point))
         return belongs
     
+    def dissimilarity(self,point1,max_steps=10000,eps=1e-5):
+        return self._metric.distance(point1,max_steps=10000,eps=1e-5)
+
+class WFRMetric(Metric):    
+    def __init__(self,M,delta,use_cuda):
+        self.M=M
+        self.delta =delta
+        self.CoM = ConeOverM(M,delta)
+        self.solver=UOTKantorovichSolver(self.CoM, use_cuda)
+        super().__init__()
+
+    def distance(self,point1,point2=None,max_steps=10000,eps=1e-5):        
+        if point2 is not None:
+            distance = torch.zeros((len(point1),len(point2)))
+            for i in range(0, distance.shape[0]):
+                for j in range(0,distance.shape[1]):
+                    print(str(i*distance.shape[0]+j+1)+"/"+str(distance.shape[0]*distance.shape[1]), end="\r")
+                    distance[i,j]=self.solver._pairwise_distance(point1[i], point2[j],max_steps,eps)
+                    distance[j,i]=distance[i,j]
+        else:
+            distance = torch.zeros((len(point1),len(point1)))
+            for i in range(0, distance.shape[0]):
+                for j in range(i+1,distance.shape[1]):
+                    print(str(i*distance.shape[0]+j+1)+"/"+str(distance.shape[0]*distance.shape[1]-distance.shape[0]), end="\r")
+                    distance[i,j]=self.solver._pairwise_distance(point1[i], point1[j],max_steps,eps)
+                    distance[j,i]=distance[i,j]
+        return distance
+    
+    
+
+class UOTKantorovichSolver:
+    def __init__(self,CoM, use_cuda):
+        self.CoM = CoM
+        self.device = torch.device("cuda:0" if use_cuda else "cpu")
+        
     def _contractionRowCol(self,P,Q,Omega,a,b,m,n):
         P = self._rowNormalize(Q*Omega,a,n)
         Q = self._colNormalize(P*Omega,b,m)
@@ -74,8 +108,8 @@ class MeasureSpace:
 
     
     def _pairwise_distance(self,point1,point2,max_steps,eps):
-        point1=point1.to(device)
-        point2=point2.to(device)
+        point1=point1.to(self.device)
+        point2=point2.to(self.device)
         a = point1[0,:]
         b = point2[0,:]
         m = a.shape[0]
@@ -96,24 +130,4 @@ class MeasureSpace:
                 
         dist=torch.sqrt(2*(self.CoM.delta**2)*(a.sum()+b.sum()-2*self._calcF(P,Q,Omega)))
         return dist
-        
-
-    def distance(self,point1,point2=None,max_steps=10000,eps=1e-5):
-        """Here we have our algorithm"""
-        
-        if point2 is not None:
-            distance = torch.zeros((len(point1),len(point2)))
-            for i in range(0, distance.shape[0]):
-                for j in range(0,distance.shape[1]):
-                    print(str(i*distance.shape[0]+j+1)+"/"+str(distance.shape[0]*distance.shape[1]), end="\r")
-                    distance[i,j]=self._pairwise_distance(point1[i], point2[j],max_steps,eps)
-                    distance[j,i]=distance[i,j]
-        else:
-            distance = torch.zeros((len(point1),len(point1)))
-            for i in range(0, distance.shape[0]):
-                for j in range(i+1,distance.shape[1]):
-                    print(str(i*distance.shape[0]+j+1)+"/"+str(distance.shape[0]*distance.shape[1]-distance.shape[0]), end="\r")
-                    distance[i,j]=self._pairwise_distance(point1[i], point1[j],max_steps,eps)
-                    distance[j,i]=distance[i,j]
-        return distance
     
