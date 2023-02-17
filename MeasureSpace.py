@@ -76,6 +76,7 @@ class UOTKantorovichSolver:
     def __init__(self,CoM, use_cuda):
         self.CoM = CoM
         self.device = torch.device("cuda:0" if use_cuda else "cpu")
+        print(torch.device)
         
     def _contractionRowCol(self,P,Q,Omega,a,b,m,n):
         P = self._rowNormalize(Q*Omega,a,n)
@@ -83,22 +84,23 @@ class UOTKantorovichSolver:
         return P,Q  
     
     def _rowNormalize(self,Pnew,a,n):
-        sums = torch.sum(Pnew*Pnew,dim=1)
+        sums = torch.sum(Pnew*Pnew,dim=0)
         zeros = sums==0
         RowNormPnew = torch.sqrt(sums.reshape(1,-1)/a.reshape(1,-1))
-        RowNormMatrix = RowNormPnew.repeat([n,1]).transpose(0,1)
-        Pnew[zeros,:]=0
-        RowNormMatrix[zeros,:]=1
+        RowNormMatrix = RowNormPnew.repeat([n,1])
+        
+        Pnew[:,zeros]=0
+        RowNormMatrix[:,zeros]=1
         PnewNormalized = Pnew/RowNormMatrix
         return PnewNormalized
     
     def _colNormalize(self,Qnew,b,m):
-        sums = torch.sum(Qnew*Qnew,dim=0)
+        sums = torch.sum(Qnew*Qnew,dim=1)
         zeros = sums==0
         ColumnNormQnew = torch.sqrt(sums.reshape(1,-1)/b.reshape(1,-1))
-        ColumnNormMatrix = ColumnNormQnew.repeat([m,1])
-        Qnew[:,zeros]=0
-        ColumnNormMatrix[:,zeros]=1
+        ColumnNormMatrix = ColumnNormQnew.repeat([m,1]).transpose(0,1)
+        Qnew[zeros,:]=0
+        ColumnNormMatrix[zeros,:]=1
         QnewNormalized = Qnew/ColumnNormMatrix
         return QnewNormalized
     
@@ -128,6 +130,5 @@ class UOTKantorovichSolver:
             if (cost[k+1]-cost[k,:])/cost[k+1]<eps:
                 break   
                 
-        dist=torch.sqrt(2*(self.CoM.delta**2)*(a.sum()+b.sum()-2*self._calcF(P,Q,Omega)))
+        dist=2*(self.CoM.delta)*torch.sqrt((a.sum()+b.sum()-2*self._calcF(P,Q,Omega)))
         return dist
-    
