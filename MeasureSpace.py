@@ -76,7 +76,6 @@ class UOTKantorovichSolver:
     def __init__(self,CoM, use_cuda):
         self.CoM = CoM
         self.device = torch.device("cuda:0" if use_cuda else "cpu")
-        print(torch.device)
         
     def _contractionRowCol(self,P,Q,Omega,a,b,m,n):
         P = self._rowNormalize(Q*Omega,a,n)

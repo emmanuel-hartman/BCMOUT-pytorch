@@ -31,7 +31,7 @@ class Euclidean(MetricSpace):
         return (points.shape[0]==self.shape)*torch.ones(points.shape[1], dtype=torch.bool)
         
         
-    def random(self, bound=1.0,samples=1):
+    def random(self,samples=1,bound=1.0):
         """Sample random points on the metric space according to a uniform distribution.
         Parameters
         ----------

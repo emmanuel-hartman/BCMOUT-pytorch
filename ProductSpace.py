@@ -2,24 +2,26 @@ import torch
 import numpy as np
 from MetricSpace import MetricSpace 
 from Metric import Metric
-from Euclidean import EuclideanMetric
 device = torch.device("cuda:0")
 
 
-class Sphere(MetricSpace):
-    """Class for a sphere
+class Product(MetricSpace):
+    """Class for a Euclidean Space
     """
     
-    def __init__(self, dim, **kwargs):
-        kwargs.setdefault("metric", SphericalMetric())
-        self.shape= dim+1
-        super().__init__(dim, **kwargs)
+    def __init__(self,M,N,a=1,**kwargs):
+        kwargs.setdefault("metric", PythagoreanMetric(M,N,a))
+        self.M=M
+        self.N=N
+        self.split=M.shape
+        self.shape= M.shape+N.shape
+        super().__init__(M.dim+N.dim, **kwargs)
       
     def belongs(self, points, atol=1e-6):
         """Evaluate if a point belongs to the metric space.
         Parameters
         ----------
-        point : array-like, shape=[point_shape,num_points]
+        point : array-like, shape=[num_points, point_shape]
             Point to evaluate.
         atol : float
             Absolute tolerance.
@@ -28,8 +30,10 @@ class Sphere(MetricSpace):
         belongs : array-like, shape=[num_points]
             Boolean evaluating if point belongs to the metric space.
         """
+        Mpoints = points[:self.split,:]
+        Npoints = points[self.split:,:]  
         
-        return torch.isclose(torch.linalg.norm(points,dim=0), torch.ones((points.shape[1])), atol=atol)
+        return torch.logical_and(self.M.belongs(Mpoints),self.N.belongs(Npoints))
         
         
     def random(self, samples=1):
@@ -45,18 +49,20 @@ class Sphere(MetricSpace):
             Points on the sphere following projected from 
         Returns
         -------
-        samples : array-like, shape=[point_shape,n_samples]
+        samples : array-like, shape=[n_samples, point_shape]
             Points sampled in the metric space.
         """
-        
-        points = 2*torch.rand(self.shape,samples)-1
-        return points/torch.linalg.norm(points,dim=0)
-        
+        return torch.cat([self.M.random(samples),self.N.random(samples)],dim=0)
+
     
-class SphericalMetric(Metric):
-    def __init__(self):
-        super().__init__()    
-    
+class PythagoreanMetric(Metric):    
+    def __init__(self,M,N,a):
+        self.M=M
+        self.N=N
+        self.a=a
+        self.split=M.shape
+        super().__init__()
+        
     def distance(self,point1,point2):
         """Compute the distance between two points.
         Parameters
@@ -70,8 +76,14 @@ class SphericalMetric(Metric):
         belongs : array-like, shape=[num_points1, num_points2, 1]
             Float evaluating the distance between two points in the metric space.
         """
-        in_prod = torch.einsum('ia,ib->ab', point1,point2)
-        d=torch.acos(in_prod)        
-        d[torch.logical_and(torch.isnan(d),in_prod>0)] = 0    
-        d[torch.logical_and(torch.isnan(d),in_prod<0)] = np.pi        
-        return d
+        Mpoint1 = point1[:self.split,:]
+        Mpoint2 = point2[:self.split,:]
+        Npoint1 = point1[self.split:,:]
+        Npoint2 = point2[self.split:,:]  
+        
+        dist1= self.M.distance(Mpoint1,Mpoint2)
+        dist2= self.a*self.N.distance(Npoint1,Npoint2)
+                
+        return torch.sqrt(dist1**2+dist2**2)
+    
+

@@ -69,4 +69,36 @@ class CosBarMetric(Metric):
                 
         d= Rpoint1.reshape(-1,1)+Rpoint2
         d=d-2*torch.sqrt(torch.outer(Rpoint1, Rpoint2))*self._energy(Mpoint1,Mpoint2)     
-        return torch.sqrt(2*(self.delta**2)*d)
+        return torch.sqrt(4*(self.delta**2)*d)
+    
+class ExpMetric(Metric):      
+    def __init__(self,M,delta):
+        self.M=M
+        self.delta =delta
+        super().__init__()
+    
+    def _energy(self,Mpoint1,Mpoint2):
+        Mdist = torch.exp(-1*self.M.distance(Mpoint1,Mpoint2)**2/(2*self.delta))
+        return Mdist
+
+    def distance(self,point1,point2):
+        """Compute the distance between two points.
+        Parameters
+        ----------
+        point1 : array-like, shape=[num_points1, point_shape]
+            Point to evaluate.
+        point2 : array-like, shape=[num_points2, point_shape]
+            Point to evaluate.
+        Returns
+        -------
+        belongs : array-like, shape=[num_points1, num_points2]
+            Float evaluating the distance between two points in the metric space.
+        """        
+        Mpoint1 = point1[1:,:]
+        Rpoint1 = point1[0,:]  
+        Mpoint2 = point2[1:,:]
+        Rpoint2 = point2[0,:]  
+                
+        d= Rpoint1.reshape(-1,1)+Rpoint2
+        d=d-2*torch.sqrt(torch.outer(Rpoint1, Rpoint2))*self._energy(Mpoint1,Mpoint2)     
+        return torch.sqrt(4*(self.delta**2)*d)
