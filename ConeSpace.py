@@ -15,8 +15,15 @@ class ConeOverM(MetricSpace):
         parameter that defines the metric on the cone
         
     """
-    def __init__(self, M, delta, **kwargs):
-        kwargs.setdefault("metric", CosBarMetric(M,delta))
+    def __init__(self, M, delta, metric=None, **kwargs):
+        
+        if metric == "CosBar":
+            kwargs.setdefault("metric", CosBarMetric(M,delta))
+        elif metric=="Exp"
+            kwargs.setdefault("metric", ExpMetric(M,delta))
+        else:
+            kwargs.setdefault("metric", CosBarMetric(M,delta))
+            
         self.M=M
         self.delta=delta
         self.shape = M.shape + 1 

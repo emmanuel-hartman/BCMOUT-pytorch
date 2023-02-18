@@ -8,17 +8,26 @@ import abc
 class MeasureSpace(MetricSpace):
     """Class for space of measures over a metric space M. Should allow comparison"""
 
-    def __init__(self, M, delta, use_cuda=False, **kwargs):
+    def __init__(self, M, delta, use_cuda=False, metric=None,**kwargs):
         """
         Parameters
         ----------
         M : MetricSpace
             Space which the measures are over
         """
-        kwargs.setdefault("metric", WFRMetric(M,delta,use_cuda))
+        
+        if metric == "WFR":
+            self.CoM = ConeOverM(M,delta,metric="CosBar")
+            kwargs.setdefault("metric", WFRMetric(M,delta))
+        elif metric=="GH"
+            self.CoM = ConeOverM(M,delta,metric="Exp")
+            kwargs.setdefault("metric", CosBarMetric(M,delta))
+        else:
+            self.CoM = ConeOverM(M,delta,metric="CosBar")
+            kwargs.setdefault("metric", WFRMetric(M,delta))
+            
         self.M = M
         self.delta=delta
-        self.CoM = ConeOverM(M,delta)
         self.shape = float('inf')
         super().__init__( float('inf') , **kwargs)
         
@@ -50,7 +59,32 @@ class WFRMetric(Metric):
         self.M=M
         self.delta =delta
         self.CoM = ConeOverM(M,delta)
-        self.solver=UOTKantorovichSolver(self.CoM, use_cuda)
+        self.solver=BCDSolver(self.CoM, use_cuda)
+        super().__init__()
+
+    def distance(self,point1,point2=None,max_steps=10000,eps=1e-5):        
+        if point2 is not None:
+            distance = torch.zeros((len(point1),len(point2)))
+            for i in range(0, distance.shape[0]):
+                for j in range(0,distance.shape[1]):
+                    print(str(i*distance.shape[0]+j+1)+"/"+str(distance.shape[0]*distance.shape[1]), end="\r")
+                    distance[i,j]=self.solver._pairwise_distance(point1[i], point2[j],max_steps,eps)
+                    distance[j,i]=distance[i,j]
+        else:
+            distance = torch.zeros((len(point1),len(point1)))
+            for i in range(0, distance.shape[0]):
+                for j in range(i+1,distance.shape[1]):
+                    print(str(i*distance.shape[0]+j+1)+"/"+str(distance.shape[0]*distance.shape[1]-distance.shape[0]), end="\r")
+                    distance[i,j]=self.solver._pairwise_distance(point1[i], point1[j],max_steps,eps)
+                    distance[j,i]=distance[i,j]
+        return distance
+    
+class GHMetric(Metric):    
+    def __init__(self,M,delta,use_cuda):
+        self.M=M
+        self.delta =delta
+        self.CoM = ConeOverM(M,delta,metric="Exp")
+        self.solver=BCDSolver(self.CoM, use_cuda)
         super().__init__()
 
     def distance(self,point1,point2=None,max_steps=10000,eps=1e-5):        
@@ -72,7 +106,7 @@ class WFRMetric(Metric):
     
     
 
-class UOTKantorovichSolver:
+class BCDSolver:
     def __init__(self,CoM, use_cuda):
         self.CoM = CoM
         self.device = torch.device("cuda:0" if use_cuda else "cpu")
