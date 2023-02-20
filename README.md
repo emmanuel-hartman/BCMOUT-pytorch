@@ -1,5 +1,5 @@
-# GUBOT-BCD
-General Unbalanced Optimal Transport - A library for the computation of unbalanced optimal transport distances between measures on an arbitrary space using block-coordinate descent.
+# BCMOUT-pytorch
+Block Coordinate Method for Optimal Unbalanced Transport - A library for the computation of optimal unbalanced transport distances between measures on an arbitrary space using block-coordinate descent.
 
 # References
 
