@@ -1,5 +1,5 @@
 # BCMOUT-pytorch
-Block Coordinate Method for Optimal Unbalanced Transport - A library for the computation of optimal unbalanced transport distances between measures on an arbitrary space using block-coordinate descent.
+Block Coordinate Method for Optimal Unbalanced Transport - A library for the computation of optimal unbalanced transport distances between measures on an arbitrary space using block-coordinate ascent.
 
 # References
 
