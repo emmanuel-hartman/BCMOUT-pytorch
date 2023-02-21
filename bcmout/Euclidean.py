@@ -2,6 +2,7 @@ import torch
 import numpy as np
 from bcmout.MetricSpace import MetricSpace 
 from bcmout.Metric import Metric
+from bcmout.LengthMetric import LengthMetric
 
 
 class Euclidean(MetricSpace):
@@ -61,7 +62,7 @@ class Euclidean(MetricSpace):
         return points
 
     
-class EuclideanMetric(Metric):
+class EuclideanMetric(LengthMetric):
     """Class for a Euclidean metric object.
     """
     
@@ -83,6 +84,24 @@ class EuclideanMetric(Metric):
         """
         
         diffs= point1.reshape(point1.shape[0],1,point1.shape[1])-point2.reshape(point2.shape[0],point2.shape[1],1)          
-        return torch.sqrt((diffs**2).sum(dim=0))
+        return torch.sqrt((diffs**2).sum(dim=0))        
     
+    def geodesic(self, point1, point2, t):
+        """Compute the distance minimizing path between two points.
+        Parameters
+        ----------
+        point1 : array-like, shape=[point_shape]
+            Point to evaluate.
+        point2 : array-like, shape=[point_shape]
+            Point to evaluate.
+        t : int
+            Number of timesteps
+        Returns
+        -------
+        geodesic : array-like, shape=[t, point_shape]
+            Length minimizing path between two points in the metric space.
+        """        
+        diff=(point2-point1)/(t-1)
+        return torch.cat([torch.unsqueeze((point1+diff*i),0) for i in range(0,t)],dim=0)
+
 

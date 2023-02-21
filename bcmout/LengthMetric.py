@@ -18,6 +18,8 @@ class LengthMetric(Metric):
             Point to evaluate.
         point2 : array-like, shape=[point_shape]
             Point to evaluate.
+        t : int
+            Number of timesteps
         Returns
         -------
         geodesic : array-like, shape=[t, point_shape]
