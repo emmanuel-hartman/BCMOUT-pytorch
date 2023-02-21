@@ -21,7 +21,7 @@ class ConeOverM(MetricSpace):
         
         if metric == "CosBar":
             kwargs.setdefault("metric", CosBarMetric(M,delta))
-        elif metric=="Exp"
+        elif metric == "Exp":
             kwargs.setdefault("metric", ExpMetric(M,delta))
         else:
             kwargs.setdefault("metric", CosBarMetric(M,delta))
