@@ -26,7 +26,7 @@ Our code is written in Python and requires the following Python libraries:
 
 # How to use
 
-For now, see Jupyter files Test*.ipynb for examples on usage. 
+See the Jupyter Notebooks in the notebooks folder for examples on usage. 
 
 # License
 
