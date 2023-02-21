@@ -22,7 +22,7 @@ class MeasureSpace(MetricSpace):
         if metric == "WFR":
             self.CoM = ConeOverM(M,delta,metric="CosBar")
             kwargs.setdefault("metric", WFRMetric(M,delta))
-        elif metric=="GH"
+        elif metric=="GH":
             self.CoM = ConeOverM(M,delta,metric="Exp")
             kwargs.setdefault("metric", CosBarMetric(M,delta))
         else:
