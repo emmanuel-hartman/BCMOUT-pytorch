@@ -4,10 +4,19 @@ from bcmout.Metric import Metric
 
 
 class Product(MetricSpace):
-    """Class for a Euclidean Space
+    """Class for a Product of two metric spaces
+    Parameters
+    ----------   
+    M : Metric Space Object
+        metric space that is the first factor of the product we are defining.
+    N : Metric Space Object
+        metric space that is the second factor of the product we are defining.
+    a : float64 
+        parameter that defines the metric on the product space.
+        Optional, default : 1.0
     """
     
-    def __init__(self,M,N,a=1,**kwargs):
+    def __init__(self,M,N,a=1.0,**kwargs):
         kwargs.setdefault("metric", PythagoreanMetric(M,N,a))
         self.M=M
         self.N=N
@@ -19,7 +28,7 @@ class Product(MetricSpace):
         """Evaluate if a point belongs to the metric space.
         Parameters
         ----------
-        point : array-like, shape=[num_points, point_shape]
+        point : array-like, shape=[point_shape,num_points]
             Point to evaluate.
         atol : float
             Absolute tolerance.
@@ -47,13 +56,24 @@ class Product(MetricSpace):
             Points on the sphere following projected from 
         Returns
         -------
-        samples : array-like, shape=[n_samples, point_shape]
+        samples : array-like, shape=[point_shape,num_points]
             Points sampled in the metric space.
         """
         return torch.cat([self.M.random(samples),self.N.random(samples)],dim=0)
 
     
-class PythagoreanMetric(Metric):    
+class PythagoreanMetric(Metric): 
+    """Class for the pythagorean Product space metric.
+    
+    Parameters
+    ----------
+    M : Metric Space Object
+        metric space that is the first factor of the product we are defining.
+    N : Metric Space Object
+        metric space that is the second factor of the product we are defining.
+    a : float64  
+        parameter that defines the metric on the cone.
+    """     
     def __init__(self,M,N,a):
         self.M=M
         self.N=N
@@ -65,9 +85,9 @@ class PythagoreanMetric(Metric):
         """Compute the distance between two points.
         Parameters
         ----------
-        point1 : array-like, shape=[num_points1, point_shape]
+        point1 : array-like, shape=[point_shape,num_points1]
             Point to evaluate.
-        point2 : array-like, shape=[num_points2, point_shape]
+        point2 : array-like, shape=[point_shape,num_points2]
             Point to evaluate.
         Returns
         -------

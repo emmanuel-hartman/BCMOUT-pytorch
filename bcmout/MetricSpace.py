@@ -6,14 +6,16 @@ class MetricSpace(abc.ABC):
     """Class for metric space.
     Parameters
     ----------
-    shape : tuple of int
-        Shape of one element of the metric space.
-        Optional, default : None.
+    dim : int
+        dimension of the metric space
+    metric:
+        Metric object associated with the metric space
+        
     Attributes
     ----------
-    metric : 
+    _metric : 
         metric on the metric space.
-    shape : int
+    dim : int
         Dimension of the array that represents the point.
     """
 
@@ -28,13 +30,13 @@ class MetricSpace(abc.ABC):
         """Evaluate if a point belongs to the metric space.
         Parameters
         ----------
-        point : array-like, shape=[..., *point_shape]
+        point : array-like, shape=[point_shape,num_points]
             Point to evaluate.
         atol : float
             Absolute tolerance.
         Returns
         -------
-        belongs : array-like, shape=[...,]
+        belongs : array-like, shape=[num_points,]
             Boolean evaluating if point belongs to the metric space.
         """
         
@@ -48,7 +50,7 @@ class MetricSpace(abc.ABC):
             Optional, default: 1.
         Returns
         -------
-        samples : array-like, shape=[..., *point_shape]
+        samples : array-like, shape=[point_shape,num_points]
             Points sampled in the metric space.
         """
     
@@ -57,16 +59,3 @@ class MetricSpace(abc.ABC):
         
     def dissimilarity(self,point1,**kwargs):
         return self.distance(point1,point1,**kwargs)
-        
-    @property
-    def metric(self):
-        """Metric associated to the space."""
-        return self._metric
-
-    @metric.setter
-    def metric(self, metric):
-        if metric is not None:
-            if not isinstance(metric, Metric):
-                raise ValueError("The argument must be a Metric object")
-        self._metric = metric
-

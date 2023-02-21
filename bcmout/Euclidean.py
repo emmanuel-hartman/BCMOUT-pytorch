@@ -5,11 +5,22 @@ from bcmout.Metric import Metric
 
 
 class Euclidean(MetricSpace):
-    """Class for a Euclidean Space
+    """Class for a Euclidean metric space
+    
+    Parameters
+    ----------
+    dim : int
+        dimension of the Euclidean space
+    metric : string  
+        String specifying what type of metric to equip the space with
+        Optional, default: 'Euclidean'
     """
     
-    def __init__(self, dim, **kwargs):
-        kwargs.setdefault("metric", EuclideanMetric())
+    def __init__(self, dim, metric="Euclidean", **kwargs):
+        if metric == "Euclidean":
+            kwargs.setdefault("metric", EuclideanMetric())
+        else:
+            kwargs.setdefault("metric", EuclideanMetric())        
         self.shape= dim
         super().__init__(dim, **kwargs)
       
@@ -17,7 +28,7 @@ class Euclidean(MetricSpace):
         """Evaluate if a point belongs to the metric space.
         Parameters
         ----------
-        point : array-like, shape=[num_points, point_shape]
+        points : array-like, shape=[point_shape,num_points]
             Point to evaluate.
         atol : float
             Absolute tolerance.
@@ -34,16 +45,15 @@ class Euclidean(MetricSpace):
         """Sample random points on the metric space according to a uniform distribution.
         Parameters
         ----------
-        n_samples : int
+        samples : int
             Number of samples.
-            Optional, default: 1.
-        rand = array-like
-            Random numbers to be used in the projection onto the hypersphere
-        points = array-like
-            Points on the sphere following projected from 
+            Optional, default: 1
+        bound : float64
+            Bound for the region to sample the points from
+            Optional, default: 1.0
         Returns
         -------
-        samples : array-like, shape=[n_samples, point_shape]
+        points : array-like, shape=[point_shape,samples]
             Points sampled in the metric space.
         """
         
@@ -51,7 +61,10 @@ class Euclidean(MetricSpace):
         return points
 
     
-class EuclideanMetric(Metric):    
+class EuclideanMetric(Metric):
+    """Class for a Euclidean metric object.
+    """
+    
     def __init__(self):
         super().__init__()
         
@@ -59,9 +72,9 @@ class EuclideanMetric(Metric):
         """Compute the distance between two points.
         Parameters
         ----------
-        point1 : array-like, shape=[num_points1, point_shape]
+        point1 : array-like, shape=[point_shape,num_points1]
             Point to evaluate.
-        point2 : array-like, shape=[num_points2, point_shape]
+        point2 : array-like, shape=[point_shape,num_points2]
             Point to evaluate.
         Returns
         -------

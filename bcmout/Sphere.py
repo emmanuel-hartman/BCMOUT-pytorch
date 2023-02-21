@@ -6,11 +6,22 @@ from bcmout.Euclidean import EuclideanMetric
 
 
 class Sphere(MetricSpace):
-    """Class for a sphere
+    """Class for a Sphere metric space
+    
+    Parameters
+    ----------
+    dim : int
+        dimension of the Sphere
+    metric : string  
+        String specifying what type of metric to equip the space with
+        Optional, default: 'Spherical'
     """
     
-    def __init__(self, dim, **kwargs):
-        kwargs.setdefault("metric", SphericalMetric())
+    def __init__(self, dim, metric='Spherical' ,**kwargs):
+        if metric == 'Spherical':
+            kwargs.setdefault("metric", SphericalMetric())
+        else:
+            kwargs.setdefault("metric", SphericalMetric())      
         self.shape= dim+1
         super().__init__(dim, **kwargs)
       
@@ -53,6 +64,9 @@ class Sphere(MetricSpace):
         
     
 class SphericalMetric(Metric):
+    """Class for the Spherical metric object.
+    """
+        
     def __init__(self):
         super().__init__()    
     
@@ -60,9 +74,9 @@ class SphericalMetric(Metric):
         """Compute the distance between two points.
         Parameters
         ----------
-        point1 : array-like, shape=[num_points1, point_shape]
+        point1 : array-like, shape=[point_shape,num_points1]
             Point to evaluate.
-        point2 : array-like, shape=[num_points2, point_shape]
+        point2 : array-like, shape=[point_shape,num_points2]
             Point to evaluate.
         Returns
         -------

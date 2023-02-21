@@ -5,11 +5,23 @@ from bcmout.MetricSpace import MetricSpace
 from bcmout.Metric import Metric 
 
 class SPDMatrices(MetricSpace):
-    """Class for SPDMatrices
+    """Class for Symmetric Positive Definite matrices
+    
+    Parameters
+    ----------
+    n : int
+        nxn matrices
+    metric : string  
+        String specifying what type of metric to equip the space with
+        Optional, default: 'WassersteinBuresMetric'
     """
     
-    def __init__(self, n,**kwargs):
-        kwargs.setdefault("metric", WassersteinBuresMetric(n))
+    def __init__(self, n,metric='WassersteinBuresMetric',**kwargs):
+        
+        if metric == 'Spherical':
+            kwargs.setdefault("metric", WassersteinBuresMetric(n))
+        else:
+            kwargs.setdefault("metric", WassersteinBuresMetric(n))
         self.dim = int((n*(n+1))/2)
         self.shape= n*n
         self.n = n
@@ -19,7 +31,7 @@ class SPDMatrices(MetricSpace):
         """Evaluate if a point belongs to the metric space.
         Parameters
         ----------
-        point : array-like, shape=[num_points,point_shape]
+        point : array-like, shape=[point_shape,num_points]
             Point to evaluate.
         atol : float
             Absolute tolerance.
@@ -61,6 +73,13 @@ class SPDMatrices(MetricSpace):
 
     
 class WassersteinBuresMetric(Metric):
+    """Class for a Wasserstein-Bures metric object.
+    
+    Parameters
+    ----------
+    n : int
+        parameter to define the shape of the objects
+    """
     def __init__(self,n,):
         self.n=n
         super().__init__()    
@@ -69,9 +88,9 @@ class WassersteinBuresMetric(Metric):
         """Compute the distance between two points.
         Parameters
         ----------
-        point1 : array-like, shape=[num_points1, point_shape]
+        point1 : array-like, shape=[point_shape,num_points1]
             Point to evaluate.
-        point2 : array-like, shape=[num_points2, point_shape]
+        point2 : array-like, shape=[point_shape,num_points2]
             Point to evaluate.
         Returns
         -------

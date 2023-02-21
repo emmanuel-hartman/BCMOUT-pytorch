@@ -5,15 +5,19 @@ from bcmout.Metric import Metric
 from bcmout.ConeSpace import ConeOverM
 
 class MeasureSpace(MetricSpace):
-    """Class for space of measures over a metric space M. Should allow comparison"""
+    """ Class for the metric space defined by the cone over a metric space
+    
+    Parameters
+    ----------
+    M : Metric Space Object
+        metric space that we are defining the space of measures over.
+    delta : float64 
+        parameter that defines the metric on the space of measures .
+    metric : string (Default: None) 
+        String specifying what type of metric to equip the space of measures with        
+    """
 
-    def __init__(self, M, delta, use_cuda=False, metric=None,**kwargs):
-        """
-        Parameters
-        ----------
-        M : MetricSpace
-            Space which the measures are over
-        """
+    def __init__(self, M, delta, metric=None, use_cuda=False,**kwargs):
         
         if metric == "WFR":
             self.CoM = ConeOverM(M,delta,metric="CosBar")
@@ -30,20 +34,43 @@ class MeasureSpace(MetricSpace):
         self.shape = float('inf')
         super().__init__( float('inf') , **kwargs)
         
-    def random(self, samples=1, n_supports=1, maxWeight=1):
-        """Create some random measures over a metric space M according to a uniform distribution.
+    def random(self, samples=1, n_supports=1, bound=1.0):
+        """Sample random points on the metric space according to a uniform distribution.
         Parameters
         ----------
+        samples : int
+            Number of samples.
+            Optional, default: 1
+        n_supports : int
+            Number of supports of the measure on M.
+            Optional, default: 1
+        bound : float64
+            Bound for the measure masses we sample from 
+            Optional, default: 1.0
+        Returns
+        -------
+        points : list-like, shape=[n_samples]
+            Points sampled in the metric space.
         """
         ls=[]
         for i in range(0,samples):
             supports = self.M.random(samples = n_supports)
-            masses = maxWeight*torch.rand(1,n_supports)
+            masses = bound*torch.rand(1,n_supports)
             point = torch.concat([masses,supports], dim=0)
             ls+=[point]        
         return ls
     
     def belongs(self, points):
+        """Evaluate if a point belongs to the metric space.
+        Parameters
+        ----------
+        points : array-like, shape=[point_shape,num_points]
+            Point to evaluate.
+        Returns
+        -------
+        belongs : array-like, shape=[num_points]
+            Boolean evaluating if point belongs to the metric space.
+        """
         belongs = torch.zeros((len(points)), dtype=torch.bool)
         for i in range(0,len(points)):
             point=points[i]
@@ -54,6 +81,17 @@ class MeasureSpace(MetricSpace):
         return self._metric.distance(point1,max_steps=10000,eps=1e-5)
 
 class WFRMetric(Metric):    
+    """Class for a Wasserstein-Fisher-Rao metric object.
+    
+    Parameters
+    ----------
+    M : Metric Space Object
+        metric space that we are defining the measure space over.
+    delta : float64 
+        parameter that defines the metric on the cone.
+    use_cuda : bool 
+        parameter that defines whether to use cuda.
+    """
     def __init__(self,M,delta,use_cuda):
         self.M=M
         self.delta =delta
@@ -61,7 +99,19 @@ class WFRMetric(Metric):
         self.solver=BCDSolver(self.CoM, use_cuda)
         super().__init__()
 
-    def distance(self,point1,point2=None,max_steps=10000,eps=1e-5):        
+    def distance(self,point1,point2=None,max_steps=10000,eps=1e-5):  
+        """Compute the distance between two points.
+        Parameters
+        ----------
+        point1 : list-like, shape=[num_points1]
+            Point to evaluate.
+        point2 : list-like, shape=[num_points2]
+            Point to evaluate.
+        Returns
+        -------
+        belongs : array-like, shape=[num_points1, num_points2]
+            Float evaluating the distance between two points in the metric space.
+        """  
         if point2 is not None:
             distance = torch.zeros((len(point1),len(point2)))
             for i in range(0, distance.shape[0]):
@@ -79,6 +129,17 @@ class WFRMetric(Metric):
         return distance
     
 class GHMetric(Metric):    
+    """Class for a Gaussian-Hellinger metric object.
+    
+    Parameters
+    ----------
+    M : Metric Space Object
+        metric space that we are defining the measure space over.
+    delta : float64 
+        parameter that defines the metric on the cone.
+    use_cuda : bool 
+        parameter that defines whether to use cuda.
+    """    
     def __init__(self,M,delta,use_cuda):
         self.M=M
         self.delta =delta
@@ -86,7 +147,19 @@ class GHMetric(Metric):
         self.solver=BCDSolver(self.CoM, use_cuda)
         super().__init__()
 
-    def distance(self,point1,point2=None,max_steps=10000,eps=1e-5):        
+    def distance(self,point1,point2=None,max_steps=10000,eps=1e-5):  
+        """Compute the distance between two points.
+        Parameters
+        ----------
+        point1 : list-like, shape=[num_points1]
+            Point to evaluate.
+        point2 : list-like, shape=[num_points2]
+            Point to evaluate.
+        Returns
+        -------
+        belongs : array-like, shape=[num_points1, num_points2]
+            Float evaluating the distance between two points in the metric space.
+        """        
         if point2 is not None:
             distance = torch.zeros((len(point1),len(point2)))
             for i in range(0, distance.shape[0]):
@@ -105,7 +178,16 @@ class GHMetric(Metric):
     
     
 
-class BCDSolver:
+class BCDSolver: 
+    """Class for a BCD solver for Kantorovich formulations of OUT.
+    
+    Parameters
+    ----------
+    CoM : Metric Space Object
+        cone space object used for the initialization of the BCD solver
+    use_cuda : bool 
+        parameter that defines whether to use cuda.
+    """ 
     def __init__(self,CoM, use_cuda):
         self.CoM = CoM
         self.device = torch.device("cuda:0" if use_cuda else "cpu")
