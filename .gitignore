@@ -1,3 +1,5 @@
 *checkpoint*
 *.pyc
 *~
+.gitignore
+Projection.ipynb

@@ -9,7 +9,7 @@ class Metric(abc.ABC):
         super().__init__(**kwargs)
         
     @abc.abstractmethod
-    def distance(self, point1, point2):
+    def distance(self, points1, points2):
         """Compute the distance matrix between two sets of points.
         Parameters
         ----------

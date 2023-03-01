@@ -19,9 +19,10 @@ class MetricSpace(abc.ABC):
         Dimension of the array that represents the point.
     """
 
-    def __init__(self, dim, metric=None, **kwargs):
+    def __init__(self, dim, metric=None, lengthMetric=None, **kwargs):
         self.dim=dim
         self._metric=metric
+        self._lengthMetric=lengthMetric
         super().__init__(**kwargs)
         
 
@@ -56,6 +57,9 @@ class MetricSpace(abc.ABC):
     
     def distance(self,points1,points2,**kwargs):
         return self._metric.distance(points1,points2, **kwargs)
+    
+    def geodesic(self,point1,point2,t,**kwargs):
+        return self._lengthMetric.distance(point1,point2,t,**kwargs)
         
-    def dissimilarity(self,point1,**kwargs):
-        return self.distance(point1,point1,**kwargs)
+    def dissimilarity(self,points1,**kwargs):
+        return self.distance(points1,points1,**kwargs)

@@ -21,13 +21,13 @@ class MeasureSpace(MetricSpace):
         
         if metric == "WFR":
             self.CoM = ConeOverM(M,delta,metric="CosBar")
-            kwargs.setdefault("metric", WFRMetric(M,delta))
+            kwargs.setdefault("metric", WFRMetric(M,delta,use_cuda))
         elif metric=="GH":
             self.CoM = ConeOverM(M,delta,metric="Exp")
-            kwargs.setdefault("metric", CosBarMetric(M,delta))
+            kwargs.setdefault("metric", CosBarMetric(M,delta,use_cuda))
         else:
             self.CoM = ConeOverM(M,delta,metric="CosBar")
-            kwargs.setdefault("metric", WFRMetric(M,delta))
+            kwargs.setdefault("metric", WFRMetric(M,delta,use_cuda))
             
         self.M = M
         self.delta=delta
