@@ -1,7 +1,8 @@
 import abc
 import torch
+from bcmout.Metric import Metric
 
-class LengthMetric(abc.ABC):    
+class LengthMetric(Metric):    
     """Class for an abstract Metric space
     """
     

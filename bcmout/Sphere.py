@@ -17,15 +17,11 @@ class Sphere(MetricSpace):
         Optional, default: 'Spherical'
     """
     
-    def __init__(self, dim, metric='Spherical', lengthMetric='Spherical',**kwargs):
+    def __init__(self, dim, metric='Spherical',**kwargs):
         if metric == 'Spherical':
             kwargs.setdefault("metric", SphericalMetric())
         else:
             kwargs.setdefault("metric", SphericalMetric())      
-        if lengthMetric == 'Spherical':
-            kwargs.setdefault("lengthMetric", SphericalLengthMetric())
-        else:
-            kwargs.setdefault("lengthMetric", SphericalLengthMetric())
         self.shape= dim+1
         super().__init__(dim, **kwargs)
       
@@ -74,6 +70,15 @@ class SphericalMetric(Metric):
     def __init__(self):
         super().__init__()    
     
+    
+    
+class SphericalMetric(LengthMetric):
+    """Class for the Spherical metric object
+    """
+    
+    def __init__(self):
+        super().__init__()
+        
     def distance(self,point1,point2):
         """Compute the distance between two points.
         Parameters
@@ -92,13 +97,6 @@ class SphericalMetric(Metric):
         d[torch.logical_and(torch.isnan(d),in_prod>0)] = 0    
         d[torch.logical_and(torch.isnan(d),in_prod<0)] = np.pi        
         return d
-    
-class SphericalLengthMetric(LengthMetric):
-    """Class for the Spherical length metric object
-    """
-    
-    def __init__(self):
-        super().__init__()
         
     def geodesic(self,point1,point2,t):
         """Returns a set of t points equally spaced on the geodesic between point1 and point2.
@@ -117,5 +115,5 @@ class SphericalLengthMetric(LengthMetric):
         w = torch.cross(torch.cross(point1,point2),point1)
         theta = np.arcos(torch.transpose(point1,0,1)*point2)
         for i in range(1,t+1):
-            geodesic[i-1] = point1*np.cos(theta*(i/(t+1))) + w*np.sin(theta*(i/(t+1)))
+            geodesic[i-1] = 
         return geodesic
