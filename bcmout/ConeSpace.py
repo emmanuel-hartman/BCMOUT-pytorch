@@ -27,6 +27,7 @@ class ConeOverM(MetricSpace):
             kwargs.setdefault("metric", CosBarMetric(M,delta))
             
         self.M=M
+        self.delta=delta
         self.shape = M.shape + 1 
         super().__init__( M.dim+1, **kwargs)
         
