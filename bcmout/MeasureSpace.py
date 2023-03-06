@@ -21,13 +21,13 @@ class MeasureSpace(MetricSpace):
         
         if metric == "WFR":
             self.CoM = ConeOverM(M,delta,metric="CosBar")
-            kwargs.setdefault("metric", WFRMetric(M,delta))
+            kwargs.setdefault("metric", WFRMetric(M,delta,use_cuda))
         elif metric=="GH":
             self.CoM = ConeOverM(M,delta,metric="Exp")
-            kwargs.setdefault("metric", CosBarMetric(M,delta))
+            kwargs.setdefault("metric", CosBarMetric(M,delta,use_cuda))
         else:
             self.CoM = ConeOverM(M,delta,metric="CosBar")
-            kwargs.setdefault("metric", WFRMetric(M,delta))
+            kwargs.setdefault("metric", WFRMetric(M,delta,use_cuda))
             
         self.M = M
         self.delta=delta
@@ -78,7 +78,7 @@ class MeasureSpace(MetricSpace):
         return belongs
     
     def dissimilarity(self,point1,max_steps=10000,eps=1e-5):
-        return self._metric.distance(point1,max_steps=10000,eps=1e-5)
+        return self._metric.distance(point1,max_steps=max_steps,eps=1e-5)
 
 class WFRMetric(Metric):    
     """Class for a Wasserstein-Fisher-Rao metric object.
