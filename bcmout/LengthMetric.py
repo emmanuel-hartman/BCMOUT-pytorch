@@ -11,15 +11,13 @@ class LengthMetric(Metric):
         
     @abc.abstractmethod
     def geodesic(self, point1, point2, t):
-        """Compute the distance minimizing path between two points.
+        """Compute t equally-spaced points on the distance-minimizing path between two points.
         Parameters
         ----------
         point1 : array-like, shape=[point_shape]
             Point to evaluate.
         point2 : array-like, shape=[point_shape]
             Point to evaluate.
-        t : int
-            Number of timesteps
         Returns
         -------
         geodesic : array-like, shape=[t, point_shape]

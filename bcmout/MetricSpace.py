@@ -56,6 +56,9 @@ class MetricSpace(abc.ABC):
     
     def distance(self,points1,points2,**kwargs):
         return self._metric.distance(points1,points2, **kwargs)
+    
+    def geodesic(self,point1,point2,t,**kwargs):
+        return self._metric.geodesic(point1,point2,t,**kwargs)
         
-    def dissimilarity(self,point1,**kwargs):
-        return self.distance(point1,point1,**kwargs)
+    def dissimilarity(self,points1,**kwargs):
+        return self.distance(points1,points1,**kwargs)
